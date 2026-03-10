@@ -1,0 +1,16 @@
+# xiaoai 自定义后端：说「爸爸最帅」唤醒，用 audio 下音频响应
+# 小米音响 / Open-XiaoAI 客户端连接本机 4399
+services:
+  xiaoai:
+    build: .
+    container_name: xiaoai
+    ports:
+      - "4399:4399"
+    volumes:
+      # 宿主机 audio 覆盖容器内 audio，便于更换回复音频（如 爸爸最帅收到收到.mp3）
+      - ./audio:/app/audio:ro
+      # 可选：若有 config.yaml，可取消下一行注释以挂载
+      # - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1

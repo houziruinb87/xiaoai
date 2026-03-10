@@ -45,15 +45,35 @@ xiaoai/
 ├── pipeline.py         # 流水线：VAD → ASR → 唤醒 → [ASR → 意图 → 分发]
 ├── vad.py / asr.py     # VAD/ASR 抽象 + 占位实现
 ├── wake.py / intent.py # 唤醒词、意图识别 + Handler 注册
-└── main.py             # 入口：启动 WS + 跑 pipeline
+├── main.py             # 入口：启动 WS + 跑 pipeline
+├── Dockerfile          # Docker 镜像
+└── docker-compose.yml  # 一键部署（端口 4399，挂载 audio）
 ```
 
 ## 使用方式
 
+### 本地运行
+
 1. 安装依赖：`pip install -r requirements.txt`（VAD/ASR 按需选型）。
 2. 复制 `config.example.yaml` 为 `config.yaml`（可选），可配置 `server`、`wake.keywords`、`wake.reply_audio`（唤醒回复音频，默认 `audio/爸爸最帅收到收到.mp3`）等。
 3. 在 `main.py` 或自己的入口里注册意图 Handler（`intent_router.register("play_music", your_handler)`），Handler 可返回 `{"tts": audio_bytes}` 用于播报。
-4. 运行：在仓库根目录执行 `python -m main`（或 `pip install -r requirements.txt` 后执行），服务监听本机 4399。
+4. 运行：在仓库根目录执行 `python -m main`，服务监听本机 4399。
+
+### Docker 部署（NAS / 极空间）
+
+小米音响说「爸爸最帅」唤醒后，用 `audio/` 下音频（如 `爸爸最帅收到收到.mp3`）响应。Open-XiaoAI 客户端需指向 NAS 的 4399 端口。
+
+```bash
+# 在仓库根目录（如 NAS 上 /data_n003/.../docker/open_xiao_ai）
+docker compose up -d --build
+
+# 查看日志
+docker compose logs -f xiaoai
+```
+
+- 端口：`4399` 映射到宿主机，客户端连 `NAS_IP:4399`。
+- 挂载：`./audio` 挂载到容器内，更换回复音频只需替换宿主机 `audio/` 下文件。
+- 可选：若有 `config.yaml`，可在 `docker-compose.yml` 中取消 `config.yaml` 挂载注释并重启。
 
 ## 项目骨架说明
 
