@@ -7,10 +7,10 @@ services:
     ports:
       - "4399:4399"
     volumes:
-      # 宿主机 audio 覆盖容器内 audio，便于更换回复音频（如 爸爸最帅收到收到.mp3）
-      - ./audio:/app/audio:ro
-      # 可选：若有 config.yaml，可取消下一行注释以挂载
-      # - ./config.yaml:/app/config.yaml:ro
+      # 宿主机 audio 覆盖容器内 xiaoai/audio
+      - ./audio:/app/xiaoai/audio:ro
+      # 可选：若有 config.yaml
+      # - ./config.yaml:/app/xiaoai/config.yaml:ro
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
