@@ -1,6 +1,6 @@
 # xiaoai 自定义后端：WebSocket 服务，与 Open-XiaoAI 客户端对接
-# 使用国内镜像源，便于 NAS 等环境拉取（若直连 Docker Hub 正常可改为 python:3.11-slim）
-FROM docker.xuanyuan.me/library/python:3.11-slim
+# 使用 1ms.run 镜像源（NAS 上已有该源的其他镜像，较稳定）
+FROM docker.1ms.run/library/python:3.11-slim
 
 WORKDIR /app
 
