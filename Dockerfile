@@ -1,6 +1,6 @@
 # xiaoai 自定义后端：WebSocket 服务，与 Open-XiaoAI 客户端对接
-# 使用 1ms.run 镜像源（NAS 上已有该源的其他镜像，较稳定）
-FROM docker.1ms.run/library/python:3.11-slim
+# 使用华为云 SWR 镜像（NAS 上若已存在该镜像则无需拉取，否则从华为云拉取较稳定）
+FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/python:3.11-slim-bullseye
 
 WORKDIR /app
 
