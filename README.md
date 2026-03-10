@@ -29,28 +29,31 @@
 - **发**：`Request` 调用客户端 RPC（如 `start_play`、`start_recording`）；`Stream`（tag=`play`）下发 TTS/播报。
 - 消息结构见 `packages/client-rust/src/services/connect/data.rs`：`AppMessage` = Request | Response | Event | Stream。
 
-## 目录结构（规划）
+## 目录结构
 
 ```
-open_xiaoai_server/
+xiaoai/
 ├── README.md           # 本说明
-├── protocol.py         # AppMessage 解析与构造
-├── transport.py        # WebSocket 服务(4399)、收发与 RPC
-├── pipeline.py         # 流水线：VAD → ASR → 唤醒 → [ASR → 意图 → 分发]
-├── vad.py              # VAD 抽象 + Silero 实现
-├── asr.py              # ASR 抽象 + 可选实现
-├── wake.py             # 唤醒词/关键词匹配
-├── intent.py           # 意图识别 + Handler 注册
+├── config.py           # 配置加载（config.yaml / config.example.yaml）
 ├── config.example.yaml # 配置示例
+├── audio_loader.py     # 唤醒回复等音频加载
+├── audio/              # 音频资源目录
+│   ├── README.md
+│   └── 爸爸最帅收到收到.mp3   # 唤醒后播报
+├── protocol.py         # AppMessage 解析与构造
+├── transport.py        # WebSocket 服务、收发与 RPC
+├── pipeline.py         # 流水线：VAD → ASR → 唤醒 → [ASR → 意图 → 分发]
+├── vad.py / asr.py     # VAD/ASR 抽象 + 占位实现
+├── wake.py / intent.py # 唤醒词、意图识别 + Handler 注册
 └── main.py             # 入口：启动 WS + 跑 pipeline
 ```
 
 ## 使用方式
 
 1. 安装依赖：`pip install -r requirements.txt`（VAD/ASR 按需选型）。
-2. 复制 `config.example.yaml` 为 `config.yaml`，填唤醒词、意图规则等。
+2. 复制 `config.example.yaml` 为 `config.yaml`（可选），可配置 `server`、`wake.keywords`、`wake.reply_audio`（唤醒回复音频，默认 `audio/爸爸最帅收到收到.mp3`）等。
 3. 在 `main.py` 或自己的入口里注册意图 Handler（`intent_router.register("play_music", your_handler)`），Handler 可返回 `{"tts": audio_bytes}` 用于播报。
-4. 运行：在仓库根目录执行 `python -m main`，服务监听本机 4399。
+4. 运行：在仓库根目录执行 `python -m main`（或 `pip install -r requirements.txt` 后执行），服务监听本机 4399。
 
 ## 项目骨架说明
 

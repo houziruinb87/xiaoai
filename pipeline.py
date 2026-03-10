@@ -22,6 +22,7 @@ class Pipeline:
         on_play_audio: Optional[Callable] = None,
         on_start_listening: Optional[Callable] = None,
         on_stop_listening: Optional[Callable] = None,
+        wake_reply_audio: Optional[bytes] = None,
     ):
         self.vad = vad
         self.asr = asr
@@ -30,6 +31,7 @@ class Pipeline:
         self.on_play_audio = on_play_audio
         self.on_start_listening = on_start_listening
         self.on_stop_listening = on_stop_listening
+        self.wake_reply_audio = wake_reply_audio or b""
         self._wake = False
         self._audio_buffer: bytearray = bytearray()
 
@@ -47,6 +49,8 @@ class Pipeline:
             if self.wake_detector.is_wake(text):
                 self._wake = True
                 logger.info("wake detected, text=%s", text)
+                if self.wake_reply_audio and self.on_play_audio:
+                    await self.on_play_audio(self.wake_reply_audio)
                 if self.on_start_listening:
                     await self.on_start_listening()
             return

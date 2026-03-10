@@ -5,6 +5,8 @@ import logging
 from typing import Optional
 
 from .asr import BaseASR, DummyASR
+from .audio_loader import get_wake_reply_audio_bytes
+from .config import get_wake_keywords, get_server_host_port
 from .intent import IntentRouter
 from .pipeline import Pipeline
 from .transport import serve
@@ -21,16 +23,23 @@ DEFAULT_SAMPLE_RATE = 16000
 def make_pipeline(
     vad: Optional[BaseVAD] = None,
     asr: Optional[BaseASR] = None,
-    keywords: list = None,
+    keywords: Optional[list] = None,
     intent_router: Optional[IntentRouter] = None,
+    wake_reply_audio: Optional[bytes] = None,
 ):
     vad = vad or DummyVAD()
     asr = asr or DummyASR()
-    wake = KeywordWake(keywords or ["小智", "小智同学", "爸爸最帅"])
+    wake = KeywordWake(keywords or get_wake_keywords())
     intent = intent_router or IntentRouter()
     intent.add_rule(r"播放|放一首|来首", "play_music", {})
     intent.add_rule(r"开灯|关灯|打开|关闭", "iot_control", {})
-    return Pipeline(vad=vad, asr=asr, wake_detector=wake, intent_router=intent)
+    return Pipeline(
+        vad=vad,
+        asr=asr,
+        wake_detector=wake,
+        intent_router=intent,
+        wake_reply_audio=wake_reply_audio or get_wake_reply_audio_bytes(),
+    )
 
 
 def on_connect(transport):
@@ -61,4 +70,5 @@ def _make_on_event(pipeline: Pipeline):
 
 
 if __name__ == "__main__":
-    asyncio.run(serve(host="0.0.0.0", port=4399, on_connect=on_connect))
+    host, port = get_server_host_port()
+    asyncio.run(serve(host=host, port=port, on_connect=on_connect))
