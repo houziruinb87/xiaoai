@@ -80,7 +80,7 @@ class Transport:
 async def serve(host: str = "0.0.0.0", port: int = 4399, on_connect=None) -> None:
     """启动 WebSocket 服务；on_connect(transport: Transport) 用于挂载 pipeline。"""
 
-    async def handler(ws: WebSocketServerProtocol, path: str) -> None:
+    async def handler(ws: WebSocketServerProtocol, path: str = None) -> None:
         transport = Transport(ws)
         if on_connect:
             on_connect(transport)
